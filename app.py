@@ -1,7 +1,8 @@
 import streamlit as st
 import matplotlib.pyplot as plt
-from src.scraper import fetch_profile
-from src.analyzer import analyze_profile
+from scraper import fetch_profile
+from analyzer import analyze_posts
+
 
 st.set_page_config(page_title="Instagram Live Profile Analyzer", layout="wide")
 st.title("📊 Instagram Live Profile Analyzer")
