@@ -1,63 +1,24 @@
-import instaloader
-from dataclasses import dataclass
+import random
+from datetime import datetime, timedelta
 
-@dataclass
-class PostData:
-    shortcode: str
-    date: object
-    likes: int
-    comments: int
-    caption: str
-    url: str
+def fetch_profile(username):
+    return {
+        "username": username,
+        "full_name": "Demo User",
+        "bio": "This is demo data for safe public deployment.",
+        "followers": random.randint(1000, 100000),
+        "following": random.randint(100, 5000),
+        "posts": random.randint(50, 500)
+    }
 
-@dataclass
-class Profile:
-    username: str
-    full_name: str
-    biography: str
-    followers: int
-    following: int
-    posts_count: int
-    profile_pic_url: str
-    posts: list
-
-def fetch_profile(username: str, max_posts: int = 20):
-    L = instaloader.Instaloader(
-        download_pictures=False,
-        download_videos=False,
-        download_video_thumbnails=False,
-        save_metadata=False,
-    )
-
-    profile = instaloader.Profile.from_username(L.context, username)
-
+def fetch_posts(username):
     posts = []
-    count = 0
-
-    for post in profile.get_posts():
-        if count >= max_posts:
-            break
-
-        real_shortcode = post.shortcode  # ✅ REAL shortcode from Instagram
-        real_url = f"https://www.instagram.com/p/{real_shortcode}/"
-
-        posts.append(PostData(
-            shortcode=real_shortcode,
-            date=post.date_utc,
-            likes=int(post.likes),
-            comments=int(post.comments),
-            caption=post.caption if post.caption else "",
-            url=real_url
-        ))
-        count += 1
-
-    return Profile(
-        username=profile.username,
-        full_name=profile.full_name,
-        biography=profile.biography,
-        followers=int(profile.followers),
-        following=int(profile.followees),
-        posts_count=int(profile.mediacount),
-        profile_pic_url=str(profile.profile_pic_url),
-        posts=posts
-    )
+    for i in range(10):
+        posts.append({
+            "date": datetime.now() - timedelta(days=i),
+            "likes": random.randint(100, 5000),
+            "comments": random.randint(5, 300),
+            "engagement": random.randint(150, 5500),
+            "url": "https://www.instagram.com/"
+        })
+    return posts
