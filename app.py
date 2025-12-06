@@ -1,73 +1,68 @@
 import streamlit as st
-import matplotlib.pyplot as plt
-from scraper import fetch_profile
-from analyzer import analyze_posts
+import pandas as pd
+import numpy as np
+from datetime import datetime, timedelta
+import random
 
+st.set_page_config(page_title="Instagram Analyzer (Demo)", layout="wide")
+st.title("📊 Instagram Profile Analyzer (Demo Mode)")
 
-st.set_page_config(page_title="Instagram Live Profile Analyzer", layout="wide")
-st.title("📊 Instagram Live Profile Analyzer")
+st.write(
+    "This is a **safe demo version**. It does *not* fetch real Instagram data, "
+    "but simulates realistic profile stats and post performance."
+)
 
-username = st.text_input("Enter Instagram Username (public only, no @)")
+username = st.text_input("Enter any username (demo only):", value="demo_user")
 
 if st.button("Analyze"):
     if not username.strip():
         st.error("Please enter a username.")
     else:
-        with st.spinner("Fetching LIVE Instagram data..."):
-            profile = fetch_profile(username.strip())
-            metrics = analyze_profile(profile)
+        followers = random.randint(1000, 100000)
+        following = random.randint(100, 5000)
+        posts_count = random.randint(20, 200)
 
-        st.success("Live analysis completed ✅")
+        st.success(f"Showing demo analytics for @{username}")
 
-        # -------- PROFILE INFO --------
-        st.subheader("📌 Profile Info")
-        col1, col2 = st.columns(2)
-
+        col1, col2, col3 = st.columns(3)
         with col1:
-            st.write("Username:", metrics["username"])
-            st.write("Full Name:", metrics["full_name"])
-            st.write("Followers:", metrics["followers"])
-            st.write("Following:", metrics["following"])
-            st.write("Total Posts:", metrics["posts_count"])
-
+            st.metric("Followers", f"{followers:,}")
         with col2:
-            st.write("Biography:")
-            st.info(metrics["biography"])
+            st.metric("Following", f"{following:,}")
+        with col3:
+            st.metric("Total Posts", posts_count)
 
-        # -------- AVERAGE ENGAGEMENT --------
-        st.subheader("📊 Average Engagement")
-        st.write("Avg Likes:", metrics["avg_likes"])
-        st.write("Avg Comments:", metrics["avg_comments"])
-        st.write("Avg Engagement:", metrics["avg_engagement"])
+        num_posts = 30
+        dates = [datetime.now() - timedelta(days=i) for i in range(num_posts)]
+        dates.reverse()
 
-        # -------- DATAFRAME --------
-        df = metrics["posts_df"]     # ✅ df is defined HERE
-        df_sorted = df.sort_values("date")
+        likes = np.random.randint(50, 5000, size=num_posts)
+        comments = np.random.randint(0, 300, size=num_posts)
+        engagement = likes + comments
 
-        st.subheader("📝 Recent Posts Data")
-        st.dataframe(df_sorted[["date", "likes", "comments", "engagement", "url"]])
+        df = pd.DataFrame({
+            "date": dates,
+            "likes": likes,
+            "comments": comments,
+            "engagement": engagement
+        })
 
-        # -------- CHART 1 --------
-        st.subheader("📈 Likes per Post")
-        fig1 = plt.figure()
-        plt.plot(df_sorted["likes"].values)
-        plt.xlabel("Post Index")
-        plt.ylabel("Likes")
-        plt.title("Likes per Post")
-        st.pyplot(fig1)
-        plt.clf()
+        st.subheader("📈 Post Performance (Demo Data)")
+        st.dataframe(df)
 
-        # -------- CHART 2 --------
-        st.subheader("📉 Engagement per Post")
-        fig2 = plt.figure()
-        plt.plot(df_sorted["engagement"].values)
-        plt.xlabel("Post Index")
-        plt.ylabel("Engagement")
-        plt.title("Engagement per Post")
-        st.pyplot(fig2)
-        plt.clf()
+        st.subheader("Likes Over Time")
+        st.line_chart(df.set_index("date")["likes"])
 
-        # -------- HASHTAGS --------
-        st.subheader("🔥 Top Hashtags")
-        for tag, count in metrics["top_hashtags"]:
-            st.write(f"{tag} → {count}")
+        st.subheader("Engagement Over Time")
+        st.line_chart(df.set_index("date")["engagement"])
+
+        st.subheader("Summary (Demo)")
+        st.write(f"- Average likes: **{int(df['likes'].mean()):,}**")
+        st.write(f"- Average comments: **{int(df['comments'].mean()):,}**")
+        st.write(f"- Best engagement: **{int(df['engagement'].max()):,}**")
+
+        st.info(
+            "This is a demo dashboard for showcasing Python, Pandas, and "
+            "data visualization skills. Live Instagram scraping is disabled "
+            "for security and reliability."
+        )
